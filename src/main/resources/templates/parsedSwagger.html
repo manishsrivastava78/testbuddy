@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+	background-color: white;
+	text-align: center;
+	color: #2a20ab;
+	font-family: Arial, Helvetica, sans-serif;
+	margin-left: 5%;
+	margin-right: 5%;
+	
+}
+
+hr {
+	color: #368f7c;
+}
+
+.collapsible {
+	background-color: #bce1eb;
+	cursor: pointer;
+	padding: 18px;
+	width: 100%;
+	border: none;
+	text-align: left;
+	outline: none;
+	font-size: 15px;
+}
+
+.collapsible:nth-child(even) {
+	background-color: #f2f2f2;
+}
+
+.active, .collapsible:hover {
+	background-color: #7193c9;
+}
+
+.content {
+	padding: 0 18px;
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.2s ease-out;
+	background-color: white;
+}
+
+table {
+	font-family: Arial, Helvetica, sans-serif;
+	border-collapse: collapse;
+	border: 1px solid #ddd;
+	width: 100%;
+	background-color: #cffad1;
+}
+
+td, th {
+	border: 1px solid #ddd;
+	padding: 8px;
+}
+
+tr:hover {
+	background-color: #ddd;
+}
+
+th {
+	padding-top: 12px;
+	padding-bottom: 12px;
+	text-align: left;
+	background-color: #4CAF50;
+	color: white;
+	border: 1px solid #ddd;
+	padding: 8px;
+}
+
+td {
+	padding-top: 12px;
+	padding-bottom: 12px;
+	text-align: left;
+	background-color: white;
+	color: black;
+	border: 1px solid #ddd;
+	padding: 8px;
+}
+#myDIV {
+  width: 100%;
+  padding: 50px 0;
+  text-align: center;
+  background-color: lightblue;
+  margin-top: 20px;
+}
+</style>
+<script>
+	function testResource(formid) {
+
+		var body, verb, hostName,basePath, resourcePath, path;
+		
+		verb = document.getElementById(formid).elements.namedItem("verb").value;
+		hostName = document.getElementById(formid).elements
+		.namedItem("hostName").value;
+		
+		hostName = document.getElementById(formid).elements
+				.namedItem("hostName").value;
+
+		 basePath = document.getElementById(formid).elements
+				.namedItem("basePath").value;
+
+		 resourcePath = document.getElementById(formid).elements
+				.namedItem("resourcePath").value;
+		 
+		 //Search for any path parameters holder in resource path
+		 var pathHolderStartIndex = resourcePath.indexOf('{');
+		
+		 if(pathHolderStartIndex != -1)
+		{
+			 var pathHolderEndIndex = resourcePath.indexOf('}'); 
+			 path = resourcePath.substr(0, pathHolderStartIndex);
+			 if (document.getElementById(formid).elements.namedItem("pathParamsVal") != null)
+				 path += document.getElementById(formid).elements.namedItem("pathParamsVal").value;
+			 
+			 path += resourcePath.substr(pathHolderEndIndex+1, resourcePath.length-1);
+		 }
+		 else
+			 path = resourcePath;
+		
+		//Read body element value if exists
+		if (document.getElementById(formid).elements.namedItem("body") != null){
+			body = document.getElementById(formid).elements.namedItem("body").value;
+			body = body.replace(/(\r\n|\n|\r)/gm, "");
+		}
+		
+	
+		
+		var queryParams = getValues("queryParams", formid);
+		
+		var httpHeaders = getValues("httpHeaders", formid);
+	
+		var reqBody = {
+			"httpSchema" : "https",
+			"host" : hostName,
+			"basePath" : basePath,
+			"resourcePath" : path,
+			"method" : verb,
+			"httpHeader": httpHeaders,
+			"queryParam" : queryParams ,
+			"body" : body
+		}
+		
+		
+		var requestBody = JSON.stringify(reqBody);
+		
+		xhr = new XMLHttpRequest();
+		var url = "/testResource";
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader("Content-type", "application/json");
+		
+		
+		alert("Your request has been sumitted for API tests report.\n\nReport page will be opened in new window.\n\nPlease wait after clicking OK.");
+		var x = document.getElementById("myDIV");
+		x.style.display = "block";
+		
+		//document.getElementById('Loading').style.visibility = 'visible';
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState == 4 && xhr.status == 200) {
+				//alert("Navjot Kaur");	
+				var report = JSON.parse(xhr.responseText);
+				//alert(temp);
+				//alert(temp.url);
+				//document.getElementById('Loading').style.visibility = 'hidden';
+				x.style.display = "none";
+				var newWindow = window.open(report.url);
+			}
+		}
+
+		xhr.send(requestBody);
+		
+	
+		return;
+
+	}
+	function test() {
+		return;
+	}
+
+	function getValues(objName, formname) {
+	
+		var form = document.getElementById(formname)
+		var arrQName = new Array();
+		var arrQValue = new Array();
+		var qParams ;
+
+		//arr = document.getElementsByName(objName);
+		arrQName = form.elements.namedItem(objName);
+		
+		if(arrQName == null)
+			{
+			return null;
+			}
+		
+		if (arrQName.length == undefined) {
+			qParams = temp += '[{"parameterName": "' + arrQName.value + '", "parameterValue": "' + arrQValue.value + '"}]';
+		} else {
+			arrQValue = form.elements.namedItem(objName + "Val");
+			var temp = "[";
+			for (var i = 0; i < arrQName.length-1; i++) {
+				a = "this is the total value";
+				//var obj = form.getEleme var obj = arrQName[i];
+				temp += '{"parameterName": "' + arrQName[i].value + '", "parameterValue": "' + arrQValue[i].value + '"},';
+			}
+			temp += '{"parameterName": "' + arrQName[i].value + '", "parameterValue": "' + arrQValue[i].value + '"}]';
+			
+			qParams = temp;
+		}
+		return qParams;
+	}
+	
+	function getFormValues(objName, formname) {
+		
+		var form = document.getElementById(formname)
+		var arrQName = new Array();
+		var arrQValue = new Array();
+		var qParams ;
+
+		//arr = document.getElementsByName(objName);
+		arrQName = form.elements.namedItem(objName);
+		
+		if(arrQName == null)
+			{
+			return null;
+			}
+		
+		if (arrQName.length == undefined) {
+			qParams = temp += '"' + arrQName.value + '"=' + arrQValue.value ;
+		} else {
+			arrQValue = form.elements.namedItem(objName + "Val");
+			var temp = "[";
+			for (var i = 0; i < arrQName.length-1; i++) {
+				a = "this is the total value";
+				//var obj = form.getEleme var obj = arrQName[i];
+				temp += '"' + arrQName[i].value + '"=' + arrQValue[i].value + '&';
+			}
+			temp += '"' + arrQName[i].value + '"=' + arrQValue[i].value;
+			
+			qParams = temp;
+		}
+		return qParams;
+	}
+</script>
+</head>
+<body>
+
+	<h2>API Test Buddy</h2>	
+	<div id="myDIV" style="display:none">
+Please wait...
+</div>
+
+	<table border="1" class="content">
+		<tr>
+			<td>API :</td>
+			<td th:text="${apiDetail.apiTitle}"></td>
+		</tr>
+		<tr>
+			<td>Host Name :</td>
+			<td th:text="${apiDetail.hostName}"></td>
+		</tr>
+		<tr>
+			<td>Base Path :</td>
+			<td th:text="${apiDetail.basePath}"></td>
+		</tr>
+		<tr>
+			<td>Scheme :</td>
+			<td th:text="${apiDetail.httpSchema}"></td>
+
+		</tr>
+	</table>
+	<div th:each="resource, st: ${apiDetail.resourceList}">
+
+		<button class="collapsible"
+			th:text="${resource.method} + ' ' + ${resource.path}"></button>
+
+		<div class="content">
+			<form th:name="${resource.operationId}"
+				th:id="${resource.operationId}" method="POST">
+				<table border="1">
+					<tr>
+						<th>Parameter Name</th>
+						<th>Description</th>
+						<th>Value</th>
+					</tr>
+					<tr th:each="resParam, st: ${resource.parameters}">
+						<th:block th:if="${resParam.in != 'body'}">
+							<td th:text="${resParam.name} + '(' + ${resParam.in} + ')'">
+								<th:block th:if="${resParam.required}">*</th:block>
+							</td>
+							<td th:text="${resParam.description}" />
+							<th:block th:if="${resParam.in == 'query'}">
+								<td><input type="text" name="queryParamsVal"
+									id="queryParamsVal" /> <input type="hidden" name="queryParams"
+									id="queryParams" th:value="${resParam.name}" /></td>
+							</th:block>
+							<th:block th:if="${resParam.in == 'header'}">
+								<td><input type="text" name="headerNameVal"
+									id="headerNameVal" /> <input type="hidden" name="headerName"
+									id="headerName" th:value="${resParam.name}" /></td>
+							</th:block>
+							<th:block th:if="${resParam.in == 'path'}">
+								<td><input type="text" name="pathParamsVal"
+									id="pathParamsVal" /> <input type="hidden" name="pathParams"
+									id="pathParams" th:value="${resParam.name}" /></td>
+							</th:block>
+							<th:block th:if="${resParam.in == 'formData'}">
+								<td><input type="text" name="formDataVal" id="formDataVal" />
+									<input type="hidden" name="formData" id="formData"
+									th:value="${resParam.name}" /></td>
+							</th:block>
+
+
+						</th:block>
+						<th:block th:if="${resParam.in == 'body'}">
+							<td th:text="${resParam.name}"><th:block
+									th:if="${resParam.isRequired}">*</th:block></td>
+							<td th:text="${resParam.description}" />
+							<td><textarea id="body" th:name="body"
+									th:utext="${resParam.jsonSchema}" rows="10" cols="20"
+									style="overflow-y: auto;"></textarea></td>
+						</th:block>
+					</tr>
+					<tr>
+						<th width="10%">Select</th>
+						<th width="30%">Scenario</th>
+						<th width="60%">Description</th>
+					</tr>
+					<tr th:each="apiResponse, st: ${resource.responses}">
+						<td><input type="checkbox" th:id="${apiResponse.responseKey}" th:name="${apiResponse.responseKey}" th:value="${apiResponse.responseKey}"></td>
+						<td th:text="${apiResponse.responseKey}"></td>
+						<td th:text="${apiResponse.responseDescription}"></td>
+					</tr>
+					
+					<tr>
+						<td colspan=3><input type="button" value="Try Now!!"
+							onclick="javascript:testResource(this.form.id);" /></td>
+					</tr>
+				</table>
+				<input type="hidden" name="verb" id="verb"
+					th:value="${resource.method}"> <input type="hidden"
+					name="formName" id="formName" th:value="${resource.operationId}">
+				<input type="hidden" name="basePath" id="basePath"
+					th:value="${apiDetail.basePath}"> <input type="hidden"
+					name="hostName" id="hostName" th:value="${apiDetail.hostName}">
+				<input type="hidden" name="httpSchema" id="httpSchema"
+					th:value="${apiDetail.httpSchema}"> <input type="hidden"
+					name="resourcePath" id="resourcePath" th:value="${resource.path}">
+			</form>
+		</div>
+
+	</div>
+
+
+	<script>
+		var coll = document.getElementsByClassName("collapsible");
+		var i;
+
+		for (i = 0; i < coll.length; i++) {
+			coll[i].addEventListener("click", function() {
+				this.classList.toggle("active");
+				var content = this.nextElementSibling;
+				if (content.style.maxHeight) {
+					content.style.maxHeight = null;
+				} else {
+					content.style.maxHeight = content.scrollHeight + "px";
+				}
+			});
+		}
+	</script>
+
+</body>
+</html>
+

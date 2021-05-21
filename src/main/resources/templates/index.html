@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">>
+<head>
+<meta charset="UTF-8">
+<title>API Test Buddy</title>
+</head>
+<body>
+<img src="../resources/logo.png"/>Welcome to API Test Buddy
+
+ <h4>Upload Single File:</h4>
+  <form method="POST" th:action="/" enctype="multipart/form-data">
+    <input type="file" name="file"/> <br/><br/>
+    <button type="submit">Submit</button>
+  </form>
+  <hr/>
+  <div th:if="${message}">
+    <h2 th:text="${message}"/>
+  </div>
+</body>
+</html>
